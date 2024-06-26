@@ -20,23 +20,14 @@ def home():
 def predict():
     data = request.json
     input_df = pd.DataFrame(data)
-
-    # Fill missing values with the mean of the column
     input_df.fillna(input_df.mean(), inplace=True)
 
-    # Features for prediction
     X_input = input_df[['remaining_battery', 'drain_rate', 'remaining_range', 'estimated_time_left', 'time_to_station', 'distance_to_station']]
 
-    # Predict priorities
+   
     predicted_priorities = model.predict(X_input)
-
-    # Add predicted priorities to input DataFrame
     input_df['predicted_priority'] = predicted_priorities
-
-    # Sort DataFrame by predicted priority
     priority_list = input_df.sort_values(by='predicted_priority', ascending=False)
-
-    # Get car_id with highest priority
     max_priority_car_id = priority_list.iloc[0]['car_id']
 
     return jsonify({'car_id': int(max_priority_car_id)})
