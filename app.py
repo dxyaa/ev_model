@@ -4,9 +4,10 @@ import numpy as np
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error, r2_score
 import joblib
-
+import os
+from flask_cors import CORS
 app = Flask(__name__)
-
+CORS(app)
 # Load the trained model
 model_path = 'C:/Users/Diya/projects/ev_charging_model_rf.joblib'
 model = joblib.load(model_path)
@@ -29,16 +30,16 @@ def predict():
     # Predict priorities
     predicted_priorities = model.predict(X_input)
 
-    # Add the predicted priorities to the input DataFrame
+    # Add predicted priorities to input DataFrame
     input_df['predicted_priority'] = predicted_priorities
 
-    # Sort the DataFrame by predicted priority
+    # Sort DataFrame by predicted priority
     priority_list = input_df.sort_values(by='predicted_priority', ascending=False)
 
-    # Get the car with the highest priority
-    highest_priority_car = priority_list.iloc[0].to_dict()
+    # Get car_id with highest priority
+    max_priority_car_id = priority_list.iloc[0]['car_id']
 
-    return jsonify(highest_priority_car)
+    return jsonify({'car_id': int(max_priority_car_id)})
 
 if __name__ == '__main__':
     app.run(debug=True)
